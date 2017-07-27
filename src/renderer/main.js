@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import axios from 'axios'
+import 'materialize-css/dist/js/materialize.js'
+import 'materialize-css/dist/css/materialize.css'
 
 import App from './App'
 import router from './router'
