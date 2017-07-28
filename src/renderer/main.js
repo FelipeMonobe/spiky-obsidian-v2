@@ -1,13 +1,15 @@
 import Vue from 'vue'
 import axios from 'axios'
-import 'materialize-css/dist/js/materialize.js'
-import 'materialize-css/dist/css/materialize.css'
+import BootstrapVue from 'bootstrap-vue/dist/bootstrap-vue.esm'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+import 'bootstrap/dist/css/bootstrap.css'
 
 import App from './App'
 import router from './router'
 import store from './store'
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
+Vue.use(BootstrapVue)
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
 
