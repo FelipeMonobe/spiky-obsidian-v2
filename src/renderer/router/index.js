@@ -1,18 +1,20 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
+import Shell from '@/components/Shell'
+import Reader from '@/components/Reader'
+import Processor from '@/components/Processor'
+
 Vue.use(Router)
 
-export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'landing-page',
-      component: require('@/components/LandingPage')
-    },
-    {
-      path: '*',
-      redirect: '/'
-    }
-  ]
-})
+const routeFactory = (name, path, component, children, redirect) =>
+  ({ name, path, component, children, redirect })
+
+const defaultRoute = routeFactory(null, '*', null, null, '/execution/')
+const readerRoute = routeFactory('execution.reader', '', Reader)
+const processorRoute = routeFactory('execution.processor', 'processor', Processor)
+const shellRoute = routeFactory(null, '/execution', Shell, [readerRoute, processorRoute])
+
+const routes = [shellRoute, defaultRoute]
+
+export default new Router({ routes })

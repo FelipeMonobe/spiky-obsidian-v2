@@ -3,6 +3,7 @@ import axios from 'axios'
 import BootstrapVue from 'bootstrap-vue/dist/bootstrap-vue.esm'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'bootstrap/dist/css/bootstrap.css'
+import 'font-awesome/css/font-awesome.css'
 
 import App from './App'
 import router from './router'
