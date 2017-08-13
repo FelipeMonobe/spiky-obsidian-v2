@@ -12,10 +12,10 @@ const state = {
 }
 
 const mutations = {
-  [READER_SET_DIRECTORY] (state, directory) {
+  [READER_SET_DIRECTORY](state, directory) {
     state.directory = directory
   },
-  [READER_SET_PATTERN] (state, pattern) {
+  [READER_SET_PATTERN](state, pattern) {
     state.pattern = pattern
   }
 }

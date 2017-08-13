@@ -13,7 +13,7 @@ const routeFactory = (name, path, component, children, redirect) =>
 const defaultRoute = routeFactory(null, '*', null, null, '/execution/')
 const readerRoute = routeFactory('execution.reader', '', Reader)
 const processorRoute = routeFactory('execution.processor', 'processor', Processor)
-const shellRoute = routeFactory(null, '/execution', Shell, [readerRoute, processorRoute])
+const shellRoute = routeFactory(null, '/execution', Shell, [processorRoute, readerRoute])
 
 const routes = [shellRoute, defaultRoute]
 
