@@ -5,7 +5,8 @@ import {
 
 const routes = [
   { position: 0, name: 'execution.reader', title: 'Leitura' },
-  { position: 1, name: 'execution.processor', title: 'Processador' }
+  { position: 1, name: 'execution.processor', title: 'Processador' },
+  { position: 2, name: 'execution.exporter', title: 'Exportador' }
 ]
 const firstPosition = routes[0].position
 const lastPosition = routes[routes.length - 1].position
@@ -22,7 +23,6 @@ const state = {
 
 const mutations = {
   [SHELL_SET_TOGGLEISLOADING](state) {
-    debugger
     state.isLoading = !state.isLoading
   },
   [SHELL_SET_CURRENTROUTE](state, direction) {

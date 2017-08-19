@@ -14,33 +14,18 @@ const parseToXml = async (rawXmls) => {
 }
 
 const pluckXmls = (xmls, options) => {
-  const optionsValues = options
-    .map(x => x.value)
-
-  const unormalizedXmls = xmls
+  return xmls
     .map(x => {
       const body = {}
 
-      optionsValues
+      options
         .forEach(y => UtilObject.getValueFromPropertyPath(y, x, body))
 
       return body
     })
-
-  return unormalizedXmls
 }
-
-// const updateXmls = (id, xmls) => {
-//   const database = UtilDb.getDbInstance()
-//   const query = { plucked: xmls }
-
-//   return database
-//     .table('xmls')
-//     .update(id, query)
-// }
 
 export default {
   parseToXml,
   pluckXmls
-  // updateXmls
 }

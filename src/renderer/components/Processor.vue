@@ -9,7 +9,7 @@
         </ol>
       </div>
     </div>
-  
+
     <div class="row">
       <div class="col">
         <b-form>
@@ -38,7 +38,8 @@ import {
   PROCESSOR_SET_MODELS,
   PROCESSOR_SET_XMLUNIQUEPROPS,
   PROCESSOR_SET_XMLSBYMODEL,
-  PROCESSOR_SET_XMLPROPERTIES
+  PROCESSOR_SET_XMLPROPERTIES,
+  PROCESSOR_SET_PLUCKEDXMLS
 } from '../store/mutation-types'
 const R = require('ramda')
 const UtilArray = require('../utils/array')
@@ -57,6 +58,7 @@ const componentData = function() {
 const componentComputed = {
   xmls: { get: getXmls },
   xmlModels: { get: getXmlModels },
+  xmlsByModel: { get: getXmlsByModel },
   xmlsUniqueProps: { get: getXmlUniqueProps },
   xmlProperties: { get: getXmlProperties, set: setXmlProperties }
 }
@@ -67,7 +69,8 @@ const componentMethods = {
     PROCESSOR_SET_MODELS,
     PROCESSOR_SET_XMLUNIQUEPROPS,
     PROCESSOR_SET_XMLSBYMODEL,
-    PROCESSOR_SET_XMLPROPERTIES
+    PROCESSOR_SET_XMLPROPERTIES,
+    PROCESSOR_SET_PLUCKEDXMLS
   ])
 }
 
@@ -101,6 +104,9 @@ function getXmls() {
 function getXmlModels() {
   return this.$store.state.processor.xmlModels
 }
+function getXmlsByModel() {
+  return this.$store.state.processor.xmlsByModel
+}
 function getXmlUniqueProps() {
   return this.$store.state.processor.xmlsUniqueProps
 }
@@ -122,23 +128,6 @@ async function componentBeforeRouteEnter(to, from, next) {
 }
 
 async function componentBeforeRouteLeave(to, from, next) {
-  _pluckProperties()
-}
-
-async function _extractXmlModels() {
-  const xmls = await ProcessorService.parseToXml(this.rawXmls)
-  const xmlsGroupedByModel = UtilArray.groupByFirstProperty(xmls)
-  const xmlModelKeys = Object.keys(xmlsGroupedByModel)
-  const xmlModels = xmlModelKeys.map(x => ({
-    text: `${x} (${xmlsGroupedByModel[x].length})`,
-    value: x
-  }))
-
-  this[PROCESSOR_SET_XMLS](xmls)
-  this[PROCESSOR_SET_MODELS](xmlModels)
-}
-
-async function _pluckProperties() {
   const pluckedXmls = ProcessorService.pluckXmls(this.xmlsByModel, this.xmlProperties)
 
   // //////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,11 +169,24 @@ async function _pluckProperties() {
     .reduce((acc, curr) => acc.concat(curr), [])
     .concat(single)
 
+  this[PROCESSOR_SET_PLUCKEDXMLS](final)
+  next()
   // //////////////////////////////////////////////////////////////////////////////////////////////
   // //////////////////////////////////////////////////////////////////////////////////////////////
   // //////////////////////////////////////////////////////////////////////////////////////////////
+}
 
-  console.log(final)
+async function _extractXmlModels() {
+  const xmls = await ProcessorService.parseToXml(this.rawXmls)
+  const xmlsGroupedByModel = UtilArray.groupByFirstProperty(xmls)
+  const xmlModelKeys = Object.keys(xmlsGroupedByModel)
+  const xmlModels = xmlModelKeys.map(x => ({
+    text: `${x} (${xmlsGroupedByModel[x].length})`,
+    value: x
+  }))
+
+  this[PROCESSOR_SET_XMLS](xmls)
+  this[PROCESSOR_SET_MODELS](xmlModels)
 }
 
 // //////////////////////////////////////////////////////////////////////////////////////////////

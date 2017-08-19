@@ -4,7 +4,8 @@ import {
   PROCESSOR_SET_XMLSBYMODEL,
   PROCESSOR_SET_XMLUNIQUEPROPS,
   PROCESSOR_SET_RAWXMLS,
-  PROCESSOR_SET_XMLPROPERTIES
+  PROCESSOR_SET_XMLPROPERTIES,
+  PROCESSOR_SET_PLUCKEDXMLS
 } from '../mutation-types'
 
 const state = {
@@ -13,12 +14,16 @@ const state = {
   xmlsByModel: [],
   xmlsUniqueProps: [],
   xmlProperties: [],
+  pluckedXmls: [],
   xmlModels: [
     { text: 'Selecione uma opção...', value: null, disabled: true }
   ]
 }
 
 const mutations = {
+  [PROCESSOR_SET_PLUCKEDXMLS](state, pluckedXmls) {
+    state.pluckedXmls = pluckedXmls
+  },
   [PROCESSOR_SET_XMLS](state, xmls) {
     state.xmls = xmls
   },
