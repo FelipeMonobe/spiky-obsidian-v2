@@ -1,15 +1,16 @@
-const { denodeify, defer } = require('q')
-const { build } = require('node-xlsx')
-const { writeFile } = require('graceful-fs')
-const { head, keys, pipe, prepend } = require('ramda')
-const { getListedValuesFromObjects } = require('../utils/array')
-const { remote: { dialog } } = require('electron')
+import { build } from 'node-xlsx'
+import { remote } from 'electron'
+import { denodeify, defer } from 'q'
+import { writeFile } from 'graceful-fs'
+import { head, keys, pipe, prepend } from 'ramda'
+import { getListedValuesFromObjects } from '@/utils/array'
 
 const _writeFile = denodeify(writeFile)
+
 const _showSaveDialog = filters => {
   const deferred = defer()
 
-  dialog.showSaveDialog(filters, path => deferred.resolve(path))
+  remote.dialog.showSaveDialog(filters, path => deferred.resolve(path))
   return deferred.promise
 }
 
@@ -42,6 +43,6 @@ const _saveXlsx = (path, xlsxBuffer) => {
   return _writeFile(path, xlsxBuffer)
 }
 
-export default {
+export {
   openDirectoryDialog
 }

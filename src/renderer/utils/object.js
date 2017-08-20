@@ -16,7 +16,6 @@ const getSampleProperties = (arr) => {
   return keys(sample)
 }
 
-// [String] -> Object -> [String]
 const getValueFromPropertyPath = (fullPath, source, target) => {
   const pathSegments = fullPath.split('.')
   const prop = last(pathSegments)
@@ -38,7 +37,7 @@ const getValueFromPropertyPath = (fullPath, source, target) => {
     : path(fullPath.split('.'), source)
 }
 
-export default {
+export {
   getValueFromPropertyPath,
   getLastNodes,
   getSampleProperties

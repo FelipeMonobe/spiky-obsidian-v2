@@ -1,19 +1,21 @@
-const R = require('ramda')
+import { groupBy, head, keys, filter } from 'ramda'
 
-const groupByFirstProperty = R.groupBy(x => R.head(R.keys(x)))
+const groupByFirstProperty = groupBy(x => head(keys(x)))
+
 const getListedValuesFromObjects = (propertiesList, objectList) => objectList
   .map(x => propertiesList
     .reduce((a, c) => {
       a.push(x[c])
       return a
     }, []))
+
 const filterByObjectPropertyName = (property) => {
-  return R.filter(x => {
+  return filter(x => {
     return x.hasOwnProperty(property)
   })
 }
 
-module.exports = {
+export {
   filterByObjectPropertyName,
   getListedValuesFromObjects,
   groupByFirstProperty

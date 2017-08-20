@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import ExporterService from '../services/exporter'
+import { openDirectoryDialog } from '@/services/exporter'
 
 const componentName = 'exporter'
 
@@ -33,7 +33,7 @@ const componentMethods = {
 }
 
 function selectDirectory() {
-  ExporterService.openDirectoryDialog(this.pluckedXmls)
+  openDirectoryDialog(this.pluckedXmls)
 }
 
 export default {

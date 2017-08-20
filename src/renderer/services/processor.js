@@ -1,15 +1,15 @@
 import { parseString } from 'xml2js'
 import { allSettled, denodeify } from 'q'
+import { partition, times, pipe, map, reduce, uniq } from 'ramda'
 
-import UtilObject from '../utils/object'
-import UtilArray from '../utils/array'
+import { getValueFromPropertyPath, getLastNodes } from '@/utils/object'
+import { filterByObjectPropertyName, groupByFirstProperty } from '@/utils/array'
 
-const R = require('ramda')
 const _parseString = denodeify(parseString)
 
 const extractXmls = async (rawXmls) => {
   const xmls = await parseToXml(rawXmls)
-  const xmlsGroupedByModel = UtilArray.groupByFirstProperty(xmls)
+  const xmlsGroupedByModel = groupByFirstProperty(xmls)
   const xmlModelKeys = Object.keys(xmlsGroupedByModel)
   const xmlModels = xmlModelKeys.map(x => ({
     text: `${x} (${xmlsGroupedByModel[x].length})`,
@@ -20,21 +20,19 @@ const extractXmls = async (rawXmls) => {
 }
 
 const normalizeXmls = (pluckedXmls) => {
-  const [multiple, single] = R
-    .partition(x => Object
-      .keys(x)
-      .map(y => x[y])
-      .some(y => Array.isArray(y))
-    , pluckedXmls)
+  const [multiple, single] = partition(x => Object.keys(x)
+    .map(y => x[y])
+    .some(y => Array.isArray(y)),
+    pluckedXmls)
 
   const replicated = multiple
     .map(x => {
-      const [arrayProps, otherProps] = R.partition(y => Array.isArray(x[y]), Object.keys(x))
+      const [arrayProps, otherProps] = partition(y => Array.isArray(x[y]), Object.keys(x))
       const sample = arrayProps[0]
       const result = []
       let qty = x[sample].length
 
-      R.times(n => {
+      times(n => {
         const body = {}
 
         otherProps.forEach(y => {
@@ -70,27 +68,27 @@ const pluckXmls = (xmls, options) => {
       const body = {}
 
       options
-        .forEach(y => UtilObject.getValueFromPropertyPath(y, x, body))
+        .forEach(y => getValueFromPropertyPath(y, x, body))
 
       return body
     })
 }
 
 const previewXmlModel = (model, xmls) => {
-  const getXmlsByModel = UtilArray.filterByObjectPropertyName(model)
+  const getXmlsByModel = filterByObjectPropertyName(model)
   const xmlsByModel = getXmlsByModel(xmls)
 
-  const uniqueXmlSamplesProps = R.pipe(
-    R.map(x => x[model]),
-    R.map(x => UtilObject.getLastNodes(x, model)),
-    R.reduce((x, y) => x.concat(y), []),
-    R.uniq
+  const uniqueXmlSamplesProps = pipe(
+    map(x => x[model]),
+    map(x => getLastNodes(x, model)),
+    reduce((x, y) => x.concat(y), []),
+    uniq
   )(xmlsByModel)
 
   return { uniqueXmlSamplesProps, xmlsByModel }
 }
 
-export default {
+export {
   extractXmls,
   normalizeXmls,
   parseToXml,

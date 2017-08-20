@@ -1,5 +1,5 @@
-import ReaderService from '@/services/reader'
-import ProcessorService from '@/services/processor'
+import { readXmlFrom } from '@/services/reader'
+import { extractXmls, pluckXmls, normalizeXmls, previewXmlModel } from '@/services/processor'
 import {
   PROCESSOR_EXTRACTXMLS,
   PROCESSOR_NORMALIZEXMLS,
@@ -62,26 +62,25 @@ const actions = {
     commit(PROCESSOR_SET_XMLPROPERTIES, properties)
   },
   async [PROCESSOR_EXTRACTXMLS]({ commit }, rawXmls) {
-    const { xmls, xmlModels } = await ProcessorService.extractXmls(rawXmls)
+    const { xmls, xmlModels } = await extractXmls(rawXmls)
 
     commit(PROCESSOR_SET_XMLS, xmls)
     commit(PROCESSOR_SET_MODELS, xmlModels)
   },
   [PROCESSOR_NORMALIZEXMLS]({ commit }, { xmlsByModel, xmlProperties }) {
-    const pluckedXmls = ProcessorService.pluckXmls(xmlsByModel, xmlProperties)
-    const normalizedXmls = ProcessorService.normalizeXmls(pluckedXmls)
+    const pluckedXmls = pluckXmls(xmlsByModel, xmlProperties)
+    const normalizedXmls = normalizeXmls(pluckedXmls)
 
     commit(PROCESSOR_SET_PLUCKEDXMLS, normalizedXmls)
   },
   [PROCESSOR_PREVIEWXMLMODEL]({ commit }, { model, xmls }) {
-    const { uniqueXmlSamplesProps, xmlsByModel } = ProcessorService
-      .previewXmlModel(model, xmls)
+    const { uniqueXmlSamplesProps, xmlsByModel } = previewXmlModel(model, xmls)
 
     commit(PROCESSOR_SET_XMLUNIQUEPROPS, uniqueXmlSamplesProps)
     commit(PROCESSOR_SET_XMLSBYMODEL, xmlsByModel)
   },
   async [PROCESSOR_SET_RAWXMLS]({ commit }, { directory, pattern }) {
-    const rawXmls = await ReaderService.readXmlFrom(directory, pattern)
+    const rawXmls = await readXmlFrom(directory, pattern)
 
     commit(PROCESSOR_SET_RAWXMLS, rawXmls)
   }
