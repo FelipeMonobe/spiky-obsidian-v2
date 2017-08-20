@@ -21,17 +21,18 @@
 import ExporterService from '../services/exporter'
 
 const componentName = 'exporter'
+
 const componentData = function() {
   return {
     pluckedXmls: this.$store.state.processor.pluckedXmls
   }
 }
+
 const componentMethods = {
   selectDirectory
 }
 
 function selectDirectory() {
-  debugger
   ExporterService.openDirectoryDialog(this.pluckedXmls)
 }
 

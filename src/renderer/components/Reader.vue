@@ -25,81 +25,49 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
-import ReaderService from '../services/reader'
 import {
   READER_SET_DIRECTORY,
   READER_SET_PATTERN,
   PROCESSOR_SET_RAWXMLS
-} from '../store/mutation-types'
-
-// //////////////////////////////////////////////////////////////////////////////////////////////
-// ///////////////////////////////// COMPONENT DEFINITION ///////////////////////////////////////
-// //////////////////////////////////////////////////////////////////////////////////////////////
+} from '@/store/mutation-types'
 
 const componentName = 'reader'
-const componentData = function() {
-  return {
-    flagDirectory: true
+
+const componentComputed = {
+  ...mapState({
+    flagDirectory: state => state.reader.flagDirectory
+  }),
+  directory: {
+    get() { return this.$store.state.reader.directory },
+    set(directory) { this[READER_SET_DIRECTORY](directory) }
+  },
+  pattern: {
+    get() { return this.$store.state.reader.pattern },
+    set(pattern) { this[READER_SET_PATTERN](pattern) }
   }
 }
-const componentComputed = {
-  directory: { get: getDirectory, set: setDirectory },
-  pattern: { get: getPattern, set: setPattern }
-}
+
 const componentMethods = {
-  ...mapMutations([
+  ...mapActions([
     READER_SET_DIRECTORY,
     READER_SET_PATTERN,
     PROCESSOR_SET_RAWXMLS
   ])
 }
 
-// //////////////////////////////////////////////////////////////////////////////////////////////
-// //////////////////////////////////// GETTERS & SETTERS ///////////////////////////////////////
-// //////////////////////////////////////////////////////////////////////////////////////////////
-
-function getDirectory() {
-  return this.$store.state.reader.directory
-}
-
-function getPattern() {
-  return this.$store.state.reader.pattern
-}
-
-function setDirectory(value) {
-  this[READER_SET_DIRECTORY](value)
-}
-
-function setPattern(value) {
-  this[READER_SET_PATTERN](value)
-}
-
-// //////////////////////////////////////////////////////////////////////////////////////////////
-// //////////////////////////////////// PRIVATE FUNCTIONS ///////////////////////////////////////
-// //////////////////////////////////////////////////////////////////////////////////////////////
-
-// _readAndStoreRawXmls (directory: String, pattern: String): Promise<Void>
-async function _readAndStoreRawXmls(directory, pattern) {
-  const xmls = await ReaderService.readXmlFrom(directory, pattern)
-
-  return xmls
-}
-// function _onRouteChange (): Void
 async function componentBeforeRouteLeave(to, from, next) {
-  const xmls = await _readAndStoreRawXmls(this.directory.path, this.pattern)
-  this[PROCESSOR_SET_RAWXMLS](xmls)
+  await this[PROCESSOR_SET_RAWXMLS]({
+    directory: this.directory.path,
+    pattern: this.pattern
+  })
+
   next()
 }
 
-// //////////////////////////////////////////////////////////////////////////////////////////////
-// ///////////////////////////////////// EXPORTATION ////////////////////////////////////////////
-// //////////////////////////////////////////////////////////////////////////////////////////////
-
 export default {
   name: componentName,
-  data: componentData,
   computed: componentComputed,
   methods: componentMethods,
   beforeRouteLeave: componentBeforeRouteLeave

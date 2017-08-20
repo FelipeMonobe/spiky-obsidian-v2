@@ -1,4 +1,9 @@
+import ReaderService from '@/services/reader'
+import ProcessorService from '@/services/processor'
 import {
+  PROCESSOR_EXTRACTXMLS,
+  PROCESSOR_NORMALIZEXMLS,
+  PROCESSOR_PREVIEWXMLMODEL,
   PROCESSOR_SET_XMLS,
   PROCESSOR_SET_MODELS,
   PROCESSOR_SET_XMLSBYMODEL,
@@ -6,7 +11,7 @@ import {
   PROCESSOR_SET_RAWXMLS,
   PROCESSOR_SET_XMLPROPERTIES,
   PROCESSOR_SET_PLUCKEDXMLS
-} from '../mutation-types'
+} from '@/store/mutation-types'
 
 const state = {
   xmls: [],
@@ -18,6 +23,14 @@ const state = {
   xmlModels: [
     { text: 'Selecione uma opção...', value: null, disabled: true }
   ]
+}
+
+const getters = {
+  xmls: state => state.xmls,
+  xmlsByModel: state => state.xmlsByModel,
+  xmlModels: state => state.xmlModels,
+  xmlsUniqueProps: state => state.xmlsUniqueProps,
+  rawXmls: state => this.$store.state.processor.rawXmls
 }
 
 const mutations = {
@@ -44,7 +57,39 @@ const mutations = {
   }
 }
 
+const actions = {
+  [PROCESSOR_SET_XMLPROPERTIES]({ commit }, properties) {
+    commit(PROCESSOR_SET_XMLPROPERTIES, properties)
+  },
+  async [PROCESSOR_EXTRACTXMLS]({ commit }, rawXmls) {
+    const { xmls, xmlModels } = await ProcessorService.extractXmls(rawXmls)
+
+    commit(PROCESSOR_SET_XMLS, xmls)
+    commit(PROCESSOR_SET_MODELS, xmlModels)
+  },
+  [PROCESSOR_NORMALIZEXMLS]({ commit }, { xmlsByModel, xmlProperties }) {
+    const pluckedXmls = ProcessorService.pluckXmls(xmlsByModel, xmlProperties)
+    const normalizedXmls = ProcessorService.normalizeXmls(pluckedXmls)
+
+    commit(PROCESSOR_SET_PLUCKEDXMLS, normalizedXmls)
+  },
+  [PROCESSOR_PREVIEWXMLMODEL]({ commit }, { model, xmls }) {
+    const { uniqueXmlSamplesProps, xmlsByModel } = ProcessorService
+      .previewXmlModel(model, xmls)
+
+    commit(PROCESSOR_SET_XMLUNIQUEPROPS, uniqueXmlSamplesProps)
+    commit(PROCESSOR_SET_XMLSBYMODEL, xmlsByModel)
+  },
+  async [PROCESSOR_SET_RAWXMLS]({ commit }, { directory, pattern }) {
+    const rawXmls = await ReaderService.readXmlFrom(directory, pattern)
+
+    commit(PROCESSOR_SET_RAWXMLS, rawXmls)
+  }
+}
+
 export default {
   state,
-  mutations
+  getters,
+  mutations,
+  actions
 }
